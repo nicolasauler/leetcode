@@ -37,11 +37,13 @@ fn rotate_left_without_extra_space(nums: &mut Vec<i32>, k: i32) {
         for mut i in start..(start + k as usize) {
             if i + k as usize >= len {
                 let num = k as usize - (i % k as usize);
+                let old_i = i;
                 for _ in 0..num {
                     while i < len - 1 {
                         nums.swap(i, i + 1);
                         i += 1;
                     }
+                    i = old_i;
                 }
                 break;
             }
@@ -75,29 +77,59 @@ fn rotate_right_without_extra_space(nums: &mut Vec<i32>, k: i32) {
     }
 }
 
+fn rotate_right_good(nums: &mut Vec<i32>, k: i32) {
+    let k: usize = k as usize % nums.len();
+    nums.reverse();
+    let (rotated, overlapped) = nums.split_at_mut(k);
+    rotated.reverse();
+    overlapped.reverse();
+}
+
 fn main() {
-    //    let mut nums = vec![1, 2, 3, 4, 5, 6, 7];
-    //    let k = 3;
-    //    rotate_left(&mut nums, k);
-    //    println!("{:?}", nums);
-    //
-    //    let mut nums = vec![1, 2, 3, 4, 5, 6, 7];
-    //    let k = 3;
-    //    rotate_right(&mut nums, k);
-    //    println!("{:?}", nums);
-    //
-    //    let mut nums = vec![-1];
-    //    let k = 2;
-    //    rotate_right(&mut nums, k);
-    //    println!("{:?}", nums);
-
-    //    let mut nums = vec![1, 2, 3, 4, 5, 6, 7];
-    //    let k = 3;
-    //    rotate_left_without_extra_space(&mut nums, k);
-    //    println!("{:?}", nums);
-
     let mut nums = vec![1, 2, 3, 4, 5, 6, 7];
     let k = 3;
-    rotate_right_without_extra_space(&mut nums, k);
-    println!("{:?}", nums);
+    rotate_right_good(&mut nums, k);
+    println!("nums: {nums:?}");
+
+    let mut nums = vec![-1];
+    let k = 2;
+    rotate_right_good(&mut nums, k);
+    println!("nums: {nums:?}");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rotate_left() {
+        let mut nums = vec![1, 2, 3, 4, 5, 6, 7];
+        let k = 3;
+        rotate_left(&mut nums, k);
+        assert_eq!(nums, vec![4, 5, 6, 7, 1, 2, 3]);
+    }
+
+    #[test]
+    fn test_rotate_right() {
+        let mut nums = vec![1, 2, 3, 4, 5, 6, 7];
+        let k = 3;
+        rotate_right(&mut nums, k);
+        assert_eq!(nums, vec![5, 6, 7, 1, 2, 3, 4]);
+    }
+
+    #[test]
+    fn test_rotate_left_without_extra_space() {
+        let mut nums = vec![1, 2, 3, 4, 5, 6, 7];
+        let k = 3;
+        rotate_left_without_extra_space(&mut nums, k);
+        assert_eq!(nums, vec![4, 5, 6, 7, 1, 2, 3]);
+    }
+
+    #[test]
+    fn test_rotate_right_without_extra_space() {
+        let mut nums = vec![1, 2, 3, 4, 5, 6, 7];
+        let k = 3;
+        rotate_right_without_extra_space(&mut nums, k);
+        assert_eq!(nums, vec![5, 6, 7, 1, 2, 3, 4]);
+    }
 }
