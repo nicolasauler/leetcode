@@ -1,0 +1,6 @@
+[package]
+name = "nested_list_weight_sum_339"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]

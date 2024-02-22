@@ -1,0 +1,6 @@
+[package]
+name = "valid_word_abbreviation_408"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
