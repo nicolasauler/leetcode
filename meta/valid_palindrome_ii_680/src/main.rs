@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 fn valid_palindrome_i(s: String) -> bool {
     let middle = s.len() / 2;
 
@@ -8,10 +10,10 @@ fn valid_palindrome_i(s: String) -> bool {
         }
     }
 
-    return true;
+    true
 }
 
-fn valid_palindrome_with_atmost_one_deletion(s: String) -> bool {
+fn valid_palindrome_with_deletions(s: String, n_deletions: usize) -> bool {
     let middle = s.len() / 2;
     let (left, right) = s.split_at(middle);
 
@@ -22,142 +24,95 @@ fn valid_palindrome_with_atmost_one_deletion(s: String) -> bool {
         let l_char = left.chars().nth(l_pos);
         let r_char = right.chars().rev().nth(r_pos);
 
-        if (r_char.is_none() && l_pos == left.len() - 1)
-            || (l_char.is_none() && r_pos == right.len() - 1)
-        {
-            break;
-        }
-
-        if l_char == r_char {
-            l_pos += 1;
-            r_pos += 1;
-        } else {
-            if left.chars().nth(l_pos + 1) == right.chars().rev().nth(r_pos) {
-                l_pos += 1;
-            } else if right.chars().rev().nth(r_pos + 1) == left.chars().nth(l_pos) {
-                r_pos += 1;
-            }
-        }
-
-        if r_pos > l_pos {
-            if r_pos - l_pos > 1 {
+        if l_char != r_char {
+            if n_deletions == 0 {
                 return false;
             }
-        } else {
-            if l_pos - r_pos > 1 {
-                return false;
+
+            let de_reverted_r_pos = right.len() - r_pos;
+            if valid_palindrome_with_deletions(
+                left[l_pos + 1..].to_owned() + &right[..de_reverted_r_pos],
+                n_deletions - 1,
+            ) {
+                return true;
             }
+
+            if valid_palindrome_with_deletions(
+                left[l_pos..].to_owned() + &right[..de_reverted_r_pos - 1],
+                n_deletions - 1,
+            ) {
+                return true;
+            }
+
+            return false;
+        }
+
+        l_pos += 1;
+        r_pos += 1;
+    }
+
+    true
+}
+
+fn check_simple_palindrome(s: &[u8]) -> bool {
+    let len = s.len();
+    for i in 0..(len / 2) {
+        if s[i] != s[len - i - 1] {
+            return false;
+        }
+    }
+    true
+}
+
+/// approach using two pointers and when we know only english characters
+fn valid_palindrome_better_for_leetcode(s: String) -> bool {
+    let s = s.as_bytes();
+    let len = s.len();
+
+    for l in 0..(len / 2) {
+        if s[l] != s[len - l - 1] {
+            let l_advance = &s[l + 1..len - l];
+            let r_retreat = &s[l..len - l - 1];
+            return check_simple_palindrome(l_advance) || check_simple_palindrome(r_retreat);
         }
     }
 
-    return true;
+    true
+}
+
+fn valid_palindrome_ext_n_deletions_leet(s: String, n_deletions: usize) -> bool {
+    let s = s.as_bytes();
+    valid_palindrome_ext_n_deletions(s, n_deletions)
+}
+
+fn valid_palindrome_ext_n_deletions(s: &[u8], n_deletions: usize) -> bool {
+    let len = s.len();
+
+    for l in 0..(len / 2) {
+        if s[l] != s[len - l - 1] {
+            if n_deletions == 0 {
+                return false;
+            }
+
+            if valid_palindrome_ext_n_deletions(&s[l..len - l - 1], n_deletions - 1)
+                || valid_palindrome_ext_n_deletions(&s[l + 1..len - l], n_deletions - 1)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    true
 }
 
 fn main() {
-    let s = "enbbe";
-    let is_valid = valid_palindrome_with_atmost_one_deletion(s.to_owned());
-    println!("{}", is_valid);
-}
+    let s = "abcdeca";
+    let is_valid = valid_palindrome_ext_n_deletions_leet(s.to_string(), 2);
+    println!("Is valid: {}", is_valid);
 
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_valid_palindrome_with_atmost_one_deletion_0() {
-        let s = "aba";
-        let is_valid = valid_palindrome_with_atmost_one_deletion(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_with_atmost_one_deletion_1() {
-        let s = "abca";
-        let is_valid = valid_palindrome_with_atmost_one_deletion(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_with_atmost_one_deletion_4() {
-        let s = "abbbca";
-        let is_valid = valid_palindrome_with_atmost_one_deletion(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_with_atmost_one_deletion_2() {
-        let s = "abba";
-        let is_valid = valid_palindrome_with_atmost_one_deletion(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_with_atmost_one_deletion_3() {
-        let s = "hannah";
-        let is_valid = valid_palindrome_with_atmost_one_deletion(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_i() {
-        let s = "aba";
-        let is_valid = valid_palindrome_i(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_i_2() {
-        let s = "abca";
-        let is_valid = valid_palindrome_i(s.to_owned());
-        assert_eq!(is_valid, false);
-    }
-
-    #[test]
-    fn test_valid_palindrome_i_3() {
-        let s = "abba";
-        let is_valid = valid_palindrome_i(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_i_4() {
-        let s = "hannah";
-        let is_valid = valid_palindrome_i(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_i_5() {
-        let s = "aaa";
-        let is_valid = valid_palindrome_i(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_i_6() {
-        let s = "aaaa";
-        let is_valid = valid_palindrome_i(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_i_7() {
-        let s = "abcba";
-        let is_valid = valid_palindrome_i(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_i_8() {
-        let s = "";
-        let is_valid = valid_palindrome_i(s.to_owned());
-        assert_eq!(is_valid, true);
-    }
-
-    #[test]
-    fn test_valid_palindrome_i_9() {
-        let s = "abcca";
-        let is_valid = valid_palindrome_i(s.to_owned());
-        assert_eq!(is_valid, false);
-    }
+    let s = "abbababa";
+    let is_valid = valid_palindrome_ext_n_deletions_leet(s.to_string(), 1);
+    println!("Is valid: {}", is_valid);
 }
