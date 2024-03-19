@@ -1,0 +1,6 @@
+[package]
+name = "buildings_with_an_ocean_view_1762"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]

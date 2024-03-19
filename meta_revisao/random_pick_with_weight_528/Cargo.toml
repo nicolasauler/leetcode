@@ -1,0 +1,6 @@
+[package]
+name = "random_pick_with_weight_528"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
