@@ -1,0 +1,6 @@
+[package]
+name = "river_sizes_algoexpert"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
